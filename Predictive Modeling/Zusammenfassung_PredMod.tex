@@ -28,21 +28,48 @@
 \usepackage{stackengine}
 \usepackage{mathtools}
 \usepackage{pdfpages}
+\usepackage{xcolor}
 
 % Code highlighting
 \usepackage{minted}
-\surroundwithmdframed{minted}
 
 % Be able to caption equations and float them in place
 \usepackage{float}
 
 \newmdtheoremenv{theorem}{Theorem}
 
-\theoremstyle{definition}
-\newmdtheoremenv{definition}{Definition}[section]
+% improved "definition" element with colored, thicker border
+%\theoremstyle{definition}
+%\newmdtheoremenv[%
+%backgroundcolor=white,
+%linecolor=teal,
+%linewidth=2pt]{definition}{}%[section]
+
+% simple frame around definition
+
+\newmdenv[%
+linecolor=teal!50,
+backgroundcolor=teal!20,
+linewidth=1.5pt]{definition}
+
+% Define the frame style for R code snippets
+\mdfdefinestyle{mystyle}{
+	linewidth=1.5pt,
+	linecolor=red,
+	% Other style options can be added here
+}
+
+% Define a new environment for R code snippets with mdframed
+\AtBeginEnvironment{minted}{\let\itshape\relax} % disable italics in minted elements
+\mdfdefinestyle{code-frame}{
+	linewidth=1.5pt,
+	linecolor=orange,
+	% Other style options can be added here
+}
+\surroundwithmdframed[style=code-frame]{minted}
 
 
-\geometry{a4paper, margin=2.4cm}
+\geometry{a4paper, margin=2.0cm}
 
 \newcommand\equalhat{\mathrel{\stackon[1.5pt]{=}{\stretchto{\scalerel*[\widthof{=}]{\wedge}{\rule{1ex}{3ex}}}{0.5ex}}}}
 \newcommand\defeq{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny def}}}{=}}}
@@ -61,6 +88,7 @@
 \newcommand*\Cov[1]{\mathop{\text{Cov}}\left(#1\right)}
 \newcommand*\Cor[1]{\mathop{\text{Cor}}\left(#1\right)}
 \newcommand*\Var[1]{\mathop{\text{Var}}\left(#1\right)}
+\newcommand*\Std[1]{\mathop{\text{Std}}\left(#1\right)}
 \newcommand*\predvar[1]{{\color{SeaGreen4} \texttt{#1}}}
 \newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
 
@@ -74,8 +102,8 @@
 
 \begin{document}
 	
-\title{Predictive Modelling FS20}
-\author{Pascal Baumann\\pascal.baumann@stud.hslu.ch}
+\title{Predictive Modeling FS24}
+\author{Pascal Baumann\\pascal.baumann@stud.hslu.ch\\\\Thomas Annen\\thomas.annen@stud.hslu.ch}
 \maketitle
 
 
@@ -87,29 +115,55 @@ For errors or improvement raise an issue or make a pull request on the \href{htt
 
 
 
-\section{Introduction}
-Statistical Modelling means finding a density function that produces your given data. From Wikipedia:
+%\section{Introduction}
+%Statistical Modeling means finding a density function that produces your given data. From Wikipedia:
 
-"Predictive modeling uses statistics to predict outcomes. Most often the event one wants to predict is in the future, but predictive modelling can be applied to any type of unknown event, regardless of when it occurred. In many cases the model is chosen on the basis of detection theory to try to guess the probability of an outcome given a set amount of input data."
+% "Predictive modeling uses statistics to predict outcomes. Most often the event one wants to predict is in the future, but predictive modelling can be applied to any type of unknown event, regardless of when it occurred. In many cases the model is chosen on the basis of detection theory to try to guess the probability of an outcome given a set amount of input data."
 
-Predictive modelling is done with Supervised Models, the major challenge in using data to make predictions is distinguishing what is a meaningful signal from the noise.
+%Predictive modeling is done with Supervised Models, the major challenge in using data to make predictions is distinguishing what is a meaningful signal from the noise.
 
-\section{Continuous Random Variables}
-The set of all possible outcomes of a random experiment is called sample space $\omega$. Random variables $X$ are real-valued functions on $\omega$. $W_X$ is the value range, that is the set of all values which $X$ can take on. If $W_X$ is discrete then $X$ is called a \emph{discrete} random variable. A probability mass function (PMF) is the probability that $X$ takes on a given value and is written as $P(X=k)$, a probability distribution is the cumulative PMF for all values $x$ in $W_X$.
+\section{Probability Models for Measurement Data}
 
-\subsection{Properties of Probability Density Functions}
-\begin{enumerate}
-	\item $f(x) \geq 0\quad \text{for all }x$
-	\item $P(a<X\leq b) = F(b) - F(a) = \int_{a}^{b}f(x) dx\quad \text{area between }a\ \text{and }b\ \text{under }f(x)$
-	\item $ \int_{-\infty}^{\infty}f(x) dx = 1$
-\end{enumerate}
+\subsection{Continuous Random Variables and Probability Distributions}
 
 \begin{definition}
-	The \textbf{expected value} of a continuous random variable is defined as
+	\textbf{Bracket notation:}\\
+	An interval $(a, b]$ contains all points $x$ with $x > a$ and $x \leq b$.
+\end{definition}
+
+\subsubsection{Probability Density}
+
+\begin{definition}
+	\textbf{Probability Density Function}\\
+	The probability density $f$ is defined as the derivative of the cumulative distribution function:
 	\begin{equation*}
-			\ev{X} = \int_{-\infty}^{\infty} x\cdot f(x) dx
+		f(x) = F'(x)
 	\end{equation*}
-	The \textbf{variance} of a continuous random variable is defined as
+\end{definition}
+
+$F(x)$ describes the cumulative distribution function (CDF). Exemplary CDF:
+
+\begin{center}
+	\includegraphics[width=0.5\linewidth]{img/cdf}
+\end{center}
+
+\begin{definition}
+	\textbf{Properties of Probability Density Function}
+	\begin{enumerate}
+		\item $f(x) \geq 0\quad \text{for all }x$
+		\item $P(a<X\leq b) = F(b) - F(a) = \int_{a}^{b}f(x) dx\quad;\quad \text{area between }a\ \text{and }b\ \text{under }f(x)$
+		\item $ \int_{-\infty}^{\infty}f(x) dx = 1$
+	\end{enumerate}
+\end{definition}
+
+
+\subsubsection{Summary Statistics of Continuous Distributions}
+
+\begin{definition}
+	\textbf{Expected value and variance}
+	\begin{equation*}
+		\ev{X} = \int_{-\infty}^{\infty} x\cdot f(x) dx
+	\end{equation*}
 	\begin{equation*}
 		\text{Var}(X) = \sigma_X^2 = \ev{((X - \ev{X})^2} = \int_{-\infty}^{\infty} (x - \ev{X})^2 f(x) dx = \ev{X^2} - \ev{X}^2
 	\end{equation*}
@@ -119,26 +173,33 @@ The set of all possible outcomes of a random experiment is called sample space $
 	\end{equation*}
 \end{definition}
 
+
+Interpretation of quantiles:
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{img/quantile}
+	\includegraphics[width=0.9\linewidth]{img/quantile}
 \end{center}
 
-\begin{definition}
-	The \textbf{sample total} is defined as 
-	\begin{equation*}
-		S_n = (X_1 + X_2 + \dots + X_n) \sim \N{n\mu, n\sigma_X^2}
-	\end{equation*}
-	\textbf{Sample mean} is defined by
-	\begin{equation*}
-		\samplemean{X}_n = \frac{S_n}{n} \sim(\mu, \frac{\sigma_X^2}{n})
-	\end{equation*}
-	\textbf{Law of Large Numbers} states that
-	\begin{equation*}
-		\samplemean{X}_n \longrightarrow \mu(n\rightarrow \infty)
-	\end{equation*}
-\end{definition}
+\subsection{Important Continuous Distributions}
 
-\subsection{Uniform Distribution}
+
+% The set of all possible outcomes of a random experiment is called sample space $\omega$. Random variables $X$ are real-valued functions on $\omega$. $W_X$ is the value range, that is the set of all values which $X$ can take on. If $W_X$ is discrete then $X$ is called a \emph{discrete} random variable. A probability mass function (PMF) is the probability that $X$ takes on a given value and is written as $P(X=k)$, a probability distribution is the cumulative PMF for all values $x$ in $W_X$.
+
+%\begin{definition}
+%	The \textbf{sample total} is defined as 
+%	\begin{equation*}
+%		S_n = (X_1 + X_2 + \dots + X_n) \sim \N{n\mu, n\sigma_X^2}
+%	\end{equation*}
+%	\textbf{Sample mean} is defined by
+%	\begin{equation*}
+%		\samplemean{X}_n = \frac{S_n}{n} \sim(\mu, \frac{\sigma_X^2}{n})
+%	\end{equation*}
+%	\textbf{Law of Large Numbers} states that
+%	\begin{equation*}
+%		\samplemean{X}_n \longrightarrow \mu(n\rightarrow \infty)
+%	\end{equation*}
+%\end{definition}
+
+\subsubsection{Uniform Distribution}
 The uniform distribution represents a probabilistic formulation of complete lack of bias or knowledge
 \begin{definition}
 	A random variable $X$ with range $W_X = [a,b]$ is uniformly distributed if
@@ -162,8 +223,35 @@ The density function is therefore constant on the interval $[a,b]$, hence the na
 		\right.
 \end{equation*}
 
-\subsection{Exponential Distribution}
-The exponential distribution is used to model the lifespan or time until failure
+For $X \thicksim \text{Uniform}([a, b])$, the summary statistics are given by:
+\begin{gather*}
+	\ev{X} = \frac{a+b}{2}\\
+	\Var{X} = \frac{(b-a)^2}{12}\\
+	\sigma_X = \frac{b-a}{\sqrt{12}}
+\end{gather*}
+
+With R the \textit{value} of the \textit{probability density function} Uniform$([1, 10])$ at the position $x$ = 5 can be calculated as follows:
+\begin{minted}{R}
+dunif(x=5, min=1, max=10)
+## [1] 0.111
+\end{minted}
+
+Example with $X \thicksim$ Uniform$([1, 10])$, the probability $P(1.2 \leq X \leq 4.8)$ is:
+\begin{minted}{R}
+punif(q=4.8, min=1, max=10) - punif(q=1.2, min=1, max=10)
+## [1] 0.4
+\end{minted}
+
+Generate uniformly distributed random variables: 
+\begin{minted}{R}
+runif(5,min=1,max=10)
+## [1] 9.022951 1.567384 4.828237 2.784172 6.743325
+\end{minted}
+
+
+
+\subsubsection{Exponential Distribution}
+The exponential distribution is used to model the lifespan or time until failure.
 \begin{definition}
 	A random variable $X$ with range $W_X = \R^+ = [0,\infty)$ is exponentially distributed with parameter $\lambda \in \R^+$ if
 	\begin{equation*}
@@ -174,6 +262,11 @@ The exponential distribution is used to model the lifespan or time until failure
 			\end{matrix}
 		\right.
 	\end{equation*}
+	We write: 
+	\begin{equation*}
+		X \thicksim \text{Exp}(\lambda)
+	\end{equation*}
+		
 \end{definition}
 The corresponding cumulative distribution function is given by
 \begin{equation*}
@@ -184,64 +277,246 @@ The corresponding cumulative distribution function is given by
 		\end{matrix}
 	\right.
 \end{equation*}
-\begin{align*}
-	\ev{X} &= \frac{1}{\lambda}\\
-	\Var{X} &= \frac{1}{\lambda^2}
-\end{align*}
-\clearpage
-\subsection{Normal Distribution}
+For $X \thicksim \text{Exp}(\lambda)$ the summary statistics are shown below:
+\begin{gather*}
+	\ev{X} = \frac{1}{\lambda}\\
+	\Var{X} = \frac{1}{\lambda^2}\\
+	\sigma_X = \frac{1}{\lambda}
+\end{gather*}
+
+(Left): Density distribution function of the exponential distribution for $\lambda$ = 1 (green),
+$\lambda$ = 2 (blue dashed) and $\lambda$ = 1/2 (violet dotted). (Right): Cumulative distribution
+function for the exponential distribution.
+\begin{center}
+	\includegraphics[width=0.9\linewidth]{img/exp-distribution}
+\end{center}
+
+Assuming  $X \thicksim \text{Exp}(3)$, the probability $P(0 \leq X \leq 4)$ can be calculated in R as follows:
+\begin{minted}{R}
+pexp(4, rate=3)
+## [1] 0.9999939
+\end{minted}
+
+
+
+\subsubsection{Normal Distribution (Gaussian)}
 The normal distribution or Gaussian distribution is the most frequent distribution occurring with measurement values.
 \begin{definition}
 	A random variable $X$ with range $W_X = \R$ is normally distributed with parameter $\mu \in \R$ and $\sigma^2\in\R^+$ if
 	\begin{equation*}
 	f(x) = \frac{1}{\sqrt{2\pi} \sigma} e^{\left( -\frac{(x-\mu)^2}{2\sigma^2} \right)}
 	\end{equation*}
-	The distribution for the random variable $X$ is denoted as follows
+	Notation \& cumulative distribution function:
 	\begin{equation*}
-		X \sim \N{\mu,\sigma^2}
+		X \sim \N{\mu,\sigma^2} \quad \quad \quad \quad F(x) = \int_{-\infty}^{x} f(y)\cdot dy
 	\end{equation*}
 \end{definition}
 
-\subsubsection{Standardisation of A Normally Distributed Random Variable}
+For $X \sim \N{\mu,\sigma^2}$ the summary statistics are shown below:
+\begin{gather*}
+	\ev{X} = \mu\\
+	\Var{X} = \sigma^2\\
+	\Std{X}=\sigma_X = \sigma
+\end{gather*}
+
+Additionally, the following rules hold:
+\begin{gather*}
+	P(\mu-\sigma \leq X \leq \mu+\sigma) \approx 0.66\\
+	P(\mu-2 \sigma \leq X \leq \mu+2 \sigma) \approx 0.95
+\end{gather*}
+
+Densities (left) and cumulative distribution functions (right) of the normal distributions for $\mu = 0$, $\sigma = 1$ (green), $\mu = 0$, $\sigma = 2$ (blue), $\mu = 0$, $\sigma = 0.75$ (violet) and $\mu = 33$, $\sigma = 1$  (red):
+
+\begin{center}
+	\includegraphics[width=0.9\linewidth]{img/gaussian-distribution}
+\end{center}
+
+Assuming $X \sim \N{100, 15^2}$ for the IQ of people, we want to find $P(X > 130)$.
+As $P(X > 130) = 1 - P(X < 130)$, we calculate it in R:
+\begin{minted}{R}
+1 - pnorm(130, mean=100, sd=15)
+## [1] 0.02275013
+\end{minted}
+
+\subsection{Linear Transformations of single random variable}
+
+\subsubsection{Transformations on Summary Statistics}
 \begin{definition}
-	For a random variable $ X\sim\N{\mu,\sigma^2} $, standardising $X$ results in a transformed random variable that is normally distributed as well. The expected value of this transformed variable becomes zero and the variance one. We thus obtain the standard normal distribution
+	\textbf{Properties of Linear Transformations of a Random Variable:}\\
+	For $Y=a+b X$, the following relations apply:
+	\begin{enumerate}[label=(\roman*)]
+		\item $\mathrm{E}(Y)=\mathrm{E}(a+b X)=a+b \mathrm{E}(X)$
+		\item $\operatorname{Var}(Y)=\operatorname{Var}(a+b X)=b^2 \operatorname{Var}(X), \quad \sigma_Y=|b| \sigma_X$
+		\item $\alpha - \text{Quantile of } Y=q_Y(\alpha)=a+b q_X(\alpha)$
+		\item $f_Y(y)=\frac{1}{b} f_X\left(\frac{y-a}{b}\right)$
+	\end{enumerate}
+\end{definition}
+
+\subsubsection{Standardization of A Normally Distributed Random Variable}
+\begin{definition}
+	Standardizing $ X\sim\N{\mu,\sigma^2} $ results in a transformed random variable that is normally distributed with expected value zero and the variance one:
 	\begin{equation*}
 		Z = \frac{X - \mu}{\sigma} \sim \N{0,1}
 	\end{equation*}
 \end{definition}
 
-\subsection{Law Of Large Numbers}
-Assume there are random variables $X_1,X_2,\dots,X_n$ i.i.d., then
-\begin{align*}
-	\ev{S_n} &= \ev{X_1 + X_2 + \dots + X_n} = \sum_{i=1}^{n} \ev{X_i} = n\mu\\
-	\Var{S_n} &= \sum_{i=1}^{n}\Var{X_i} = n\Var{X_i} = n\sigma_X^2\\
-	\sigma(S_n) &= \sqrt{n}\sigma_X
-\end{align*}
-The summary statistics of $\samplemean{X}_n$ thus are
-\begin{align*}
-	\ev{\samplemean{X}_n} &= \ev{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n} \sum_{i=1}^{n} \ev{X_i} = \mu\\
-	\Var{\samplemean{X}_n} &= \Var{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n^2} \sum_{i=1}^{n}\Var{X_i}  = \frac{1}{n^2}n\sigma_X^2 = \frac{\sigma_X^2}{n}\\
-	\sigma_{\samplemean{X}_n} &= \frac{\sigma_X}{\sqrt{n}} = \frac{1}{\sqrt{n}} \sigma_X
-\end{align*}
-The standard deviation of $\samplemean{X}_n$ is called \textbf{standard error} of the sample mean.
+\textbf{Example:} If $X \sim \mathcal{N}\left(\mu, \sigma^2\right)$ with $\mu=2$ and $\sigma^2=4$, then:
+\begin{equation*}
+	P(X \leq 5)=P\left(\frac{X-\mu}{\sigma} \leq \frac{5-\mu}{\sigma}\right)=P\left(Z \leq \frac{5-2}{2}\right)=P(Z \leq 1.5)=\Phi(1.5)=0.93
+\end{equation*}
+$\Phi$ is the CDF, calculation in R: 
+\begin{minted}{R}
+pnorm(1.5, 0, 1)
+## [1] 0.9331928
+\end{minted}
+
+\subsection{Non-Linear Transformations}
+
 \begin{definition}
-	For $n\rightarrow\infty$ the dispersion of the random variables approaches zero. If $X_1,X_2,\dots,X_n$ are i.i.d. then the \textbf{law of large numbers} applies
+	\textbf{General Transformations of a Random Variable:}\\
+	Let us consider the general transformation of a random variable $X$:
+	\begin{equation*}
+		Y=g(X)
+	\end{equation*}
+	
+	The cumulative distribution function and the density of $Y$ are determined by the density distribution function of $X$. The following formula can always be used for the calculation of the expected value
+	\begin{equation*}
+		\mathrm{E}(Y)=\mathrm{E}(g(X))=\int_{-\infty}^{\infty} g(x) f_X(x) \mathrm{d} x
+	\end{equation*}
+\end{definition}
+
+\subsection{Functions of Several Random Variables}
+\subsubsection{Independence and i.i.d. Assumption}
+If the random variables $X_1, \ldots, X_n$ are independent and all follow the same distribution, we use the following notation $X_1, \ldots, X_n \text{ i.i.d. }$. The abbreviation \textbf{i.i.d.} stands for:
+\begin{center}
+\textbf{i}ndependent, \textbf{i}dentically \textbf{d}istributed
+\end{center}
+
+\noindent
+The following relation is always true:
+$$
+\mathrm{E}\left(X_1+X_2\right)=\mathrm{E}\left(X_1\right)+\mathrm{E}\left(X_2\right)
+$$
+The following relation only holds, if $X_1$ and $X_2$ are independent:
+$$
+\operatorname{Var}\left(X_1+X_2\right)=\operatorname{Var}\left(X_1\right)+\operatorname{Var}\left(X_2\right)
+$$
+
+\subsubsection{Summary Statistics of $S_n$ and $\bar{X}_n$}
+
+\begin{definition}
+	\textbf{Summary Statistics of the Sample Total $S_n$:}\\
+	For random variables $X_1,X_2,\dots,X_n$ i.i.d.:
+	\begin{align*}
+		\ev{S_n} &= \ev{X_1 + X_2 + \dots + X_n} = \sum_{i=1}^{n} \ev{X_i} = n\mu\\
+		\Var{S_n} &= \sum_{i=1}^{n}\Var{X_i} = n\Var{X_i} = n\sigma_X^2\\
+		\sigma(S_n) &= \sqrt{n}\sigma_X
+	\end{align*}
+\end{definition}
+
+\begin{definition}
+	\textbf{Summary Statistics of the Sample Mean $\samplemean{X}_n$}\\
+	The standard deviation of $\samplemean{X}_n$ is called the standard error of the sample mean.
+	\begin{align*}
+		\ev{\samplemean{X}_n} &= \ev{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n} \sum_{i=1}^{n} \ev{X_i} = \mu\\
+		\Var{\samplemean{X}_n} &= \Var{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n^2} \sum_{i=1}^{n}\Var{X_i}  = \frac{1}{n^2}n\sigma_X^2 = \frac{\sigma_X^2}{n}\\
+		\sigma (\samplemean{X}_n) &= \frac{\sigma_X}{\sqrt{n}} = \frac{1}{\sqrt{n}} \sigma_X
+	\end{align*}
+\end{definition}
+
+\begin{definition}
+	\textbf{Law of Large Numbers}\\
+	For $n\rightarrow\infty$ the dispersion of the random variables approaches zero. If $X_1,X_2,\dots,X_n$ are i.i.d. then the \textbf{law of large numbers} applies:
 	\begin{equation*}
 		\samplemean{X}_n \longrightarrow \mu \qquad\text{for} (n\rightarrow\infty)
 	\end{equation*}
 \end{definition}
-The standard error is not proportional to $\frac{1}{n}$ but decreases with factor $\frac{1}{\sqrt{n}}$. Thus, to half the standard error, four times as many observations are needed, this is called the $\bm{\sqrt{n}}$-\textbf{law}.
 
-\subsection{Central Limit Theorem}
+\begin{definition}
+	\textbf{Standard Error}\\
+	The standard deviation of the sample mean (\textit{standard error}) is, however, \textit{not} proportional
+	to $1/n$ but decreases only by the factor $1/\sqrt{n}$. To halve the standard error, one needs four times as many observations. This is also known as the $\sqrt{n}$-law.
+	\begin{equation*}
+		\sigma (\samplemean{X}_n) = \sigma_{\samplemean{X}_n} = \frac{\sigma_X}{\sqrt{n}} = \frac{1}{\sqrt{n}} \sigma_X
+	\end{equation*}
+\end{definition}
+
+\subsubsection{Central Limit Theorem}
 \begin{definition}
 	Let $X_1,X_2,\dots,X_n$ be i.i.d. with expected value $\mu$ and variance $\sigma^2$, then
 	\begin{align*}
-		S_n &\approx \N{n_\mu, n\sigma_X^2}\\
+		S_n &\approx \N{n \cdot \mu, n \cdot \sigma_X^2}\\
 		\samplemean{X}_n &\approx \N{\mu,\frac{\sigma_X^2}{n}}
 	\end{align*}
 	This approximation becomes more precise the larger $n$ is. Moreover, the approximation is better, the more the distribution of the random variable $X_i$ is similar to a normal distribution $\N{\mu,\sigma_X^2}$.
 \end{definition}
 
+
+\noindent
+\textbf{Example:} What is the probability that among 10000 tosses of a fair coin, heads would appear in maximum 5100 cases? The number of tosses of a coin in which heads appear follows a $\operatorname{Bin}(10000,0.5)$ distribution. We approximate this distribution as a normal distribution, i.e.,
+$$
+X \sim \mathcal{N}\left(\mu, \sigma^2\right)
+$$
+with
+$$
+\mu=10000 \cdot 0.5=5000 \text { and } \sigma^2=10000 \cdot 0.5 \cdot(1-0.5)=2500
+$$
+
+\noindent
+And we obtain
+$$
+X \sim \operatorname{Bin}(10000,0.5) \approx \mathcal{N}(5000,2500)
+$$
+
+\noindent
+We are interested in the probability
+$$
+P(X \leq 5100)=\Phi\left(\frac{5100-5000}{\sqrt{2500}}\right)=\Phi(2) \approx 0.98
+$$
+
+
+\begin{minted}{R}
+pnorm(5100,5000,sqrt(2500)) # approximated calculation
+## [1] 0.9772499
+
+pbinom(5100,10000,.5) # exact calculation
+## [1] 0.9777871
+\end{minted}
+
+\subsection{Distribution Summary}
+
+\begin{center}
+	\includegraphics[width=1.0\linewidth]{img/distribution-summary}
+\end{center}
+
+\newpage
+\section{Statistics for Measurement Data}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
 \section{QQ-Plots, Parameter Estimation and t-Tests}
 
 \subsection{QQ-Plot}
