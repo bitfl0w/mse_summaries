@@ -176,7 +176,7 @@ $F(x)$ describes the cumulative distribution function (CDF). Exemplary CDF:
 
 Interpretation of quantiles:
 \begin{center}
-	\includegraphics[width=0.9\linewidth]{img/quantile}
+	\includegraphics[width=0.8\linewidth]{img/quantile}
 \end{center}
 
 \subsection{Important Continuous Distributions}
@@ -419,7 +419,7 @@ $$
 	The standard deviation of $\samplemean{X}_n$ is called the standard error of the sample mean.
 	\begin{align*}
 		\ev{\samplemean{X}_n} &= \ev{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n} \sum_{i=1}^{n} \ev{X_i} = \mu\\
-		\Var{\samplemean{X}_n} &= \Var{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n^2} \sum_{i=1}^{n}\Var{X_i}  = \frac{1}{n^2}n\sigma_X^2 = \frac{\sigma_X^2}{n}\\
+		\Var{\samplemean{X}_n} &= \Var{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n^2} \sum_{i=1}^{n}\Var{X_i} = \frac{1}{n^2}n\sigma_X^2 = \frac{\sigma_X^2}{n}\\
 		\sigma (\samplemean{X}_n) &= \frac{\sigma_X}{\sqrt{n}} = \frac{1}{\sqrt{n}} \sigma_X
 	\end{align*}
 \end{definition}
@@ -492,145 +492,245 @@ pbinom(5100,10000,.5) # exact calculation
 \newpage
 \section{Statistics for Measurement Data}
 
+\subsection{Assess the Normal Distribution Assumption}
+% \section{QQ-Plots, Parameter Estimation and t-Tests}
+\subsubsection{QQ-Plot}
 
+A QQ-plot is the empirical quantiles calculated from the data, plotted against the theoretical quantiles. If the data is normal distributed the resulting plot has a linear relationship.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\newpage
-\section{QQ-Plots, Parameter Estimation and t-Tests}
-
-\subsection{QQ-Plot}
-
-A QQ-plot is the empirical quantiles calculated from the data plotted against the theoretical quantiles. If the data is normal distributed the resulting plot has a linear relationship.
-
-\subsubsection{Normal Plot}
 \begin{enumerate}[label=(\arabic*)]
-	\item Data set $x_1,x_2,\dots, x_n$
-	\item $\alpha_k = \frac{k-0.5}{n}\quad k=1,2,\dots,n$
+	\item Data set $x_1,x_2,\dots, x_n$ ordered from small to large.
+	\item $\alpha_k = \frac{k-0.5}{n}\quad \text{with } k=1,2,\dots,n$
 	\item Theoretical Quantile $q(\alpha_k) = \Phi^{-1}(\alpha_k)$
 	\item Empirical Quantile $x_{(1)}, x_{(2)},\dots, x_{(n)}$
-	\item Plot $\left( q(\alpha_k), x_{(k)} \right)$
+	\item Plot $\left( q(\alpha_k), x_{(k)} \right)$ to get the QQ-Plot.
 \end{enumerate}
 
+\begin{minted}{R}
+# Values orded by size:
+x <- c(24.4, 27.6, 27.8, 27.9, 28.5, 30.1, 30.3, 31.7, 32.2, 32.8, 33.3, 
+  33.5, 34.1, 34.6, 35.8, 35.9, 36.8, 37.1, 39.2, 39.7)
+
+# Quantiles
+alpha_k <- (seq(1, length(x),by=1)-0.5)/length(x)
+quantile_theor <- qnorm(alpha_k, mean=mean(x),sd=sd(x))
+quantile_empir <- sort(x)
+
+# Q-Q-Plot
+qqplot(quantile_theor, quantile_empir, xlab="Theoritcal Quantile",
+  ylab="Empirical Quantile")
+\end{minted}
+
+\subsubsection{Normal Plot}
+Special case of QQ-plot, where the empirical quantiles are plotted against the quantiles of the standard normal distribution $X \sim \mathcal{N}\left(0, 1\right)$. If we generate a normal plot, the points in the normal plot will lie approximately on a straight line having axis intercept $\mu$ and slope $\sigma$, when we have a normal distribution.
+
+
+\textit{Left:} Normal plot for 50 realizations of N(0, 1). The dots lie on a straight line.
+
+\textit{Right:} A distribution which is very long-tailed, dots do not form a straight line.
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{img/qq-plot-comparison}
+\end{center}
 
 \subsection{Parameter Estimation}
-\begin{minipage}{0.6\linewidth}
-	Once we have verified that a data set follows a presumed distribution, how to estimate the \textbf{parameters} of the distribution from the $n$ observations
-	\begin{equation*}
-		X_1 = x_1, X_2 = x_2, \dots , X_n = x_n
-	\end{equation*}
-	For a discrete probability distribution the probability that these $n$ observations or events actually have occurred can be expressed as
-	\begin{equation*}
-		P[X_1 = x_1] \cdot P[X_2 = x_2] \cdot \dots \cdot P[X_n = x_n] \equiv \prod_{i=1}^{n} P[X_i = x_i]
-	\end{equation*}
-	The probability that the $n$ independent random variables $x_1,x_2,\dots,x_n$ are observed, depends on the \textbf{parameter $\theta$} which needs to be \textbf{estimated}.
-	The Likelihood function $\Likelihood(\theta)$ is therefore given by
-	\begin{equation*}
-		\Likelihood(\theta) = \prod_{i=1}^{n} P[X_i = x_i | \theta ]
-	\end{equation*}
-	where $P[X_i = x_i | \theta ]$ denotes the probability mass function that value $x_i$ has been observed given $\theta$.
-\end{minipage}
-\begin{minipage}{0.4\linewidth}
-	\centering
-	\includegraphics[keepaspectratio, width=0.8\linewidth]{probtheory_model}
-\end{minipage}
 
-The idea of \textbf{Maximum Likelihood} is to estimate the parameter $\theta$ in such a way that the \textbf{likelihood is maximised}, that is \emph{makes the observed data most likely or most probable}.
-
-\subsection{Maximum Likelihood Continuous Distribution}
-Given a continuous probability distribution  with probability density function $f (x;\theta)$, then the probability that each observation $x_i$ falls into its corresponding interval $[x_i, x_i + \text{d}x_i]$ is
+\subsubsection{Method of Moments}
+We simply use the following formulas to estimate the parameters: 
 \begin{equation*}
-	\prod_{i=1}^{n} f(x_i; \theta) \text{d}x_i
+	\mu = \ev{X} \Rightarrow \hat{\mu} = \bar{x}_n = \dfrac{x_1+x_2 + ... + x_n}{n}\\
+\end{equation*}
+\begin{align*}
+	\sigma_X^2 &= \ev{X^2} - \ev{X}^2\\
+	 &= \ev{X^2} - \mu^2
+\end{align*}
+
+\noindent
+For an \textbf{exponential distribution}, we simply use:
+\begin{equation*}
+	\ev{X} = \dfrac{1}{\lambda} \Rightarrow \hat{\lambda} = \dfrac{1}{\hat{x}}
 \end{equation*}
 
-Infinitesimal intervals $\text{d}x_i$ do not depend on parameter value $\theta$, they can thus be omitted in the \textbf{likelihood function}
-
+\subsubsection{Method of Maximum Likelihood}
+For a discrete probability distribution, the probability that these $n$ observations or events actually have occurred can be expressed as:
 \begin{equation*}
-	\Likelihood = \prod_{i=1}^{n} f(x_i;\theta)
+	P[X_1 = x_1] \cdot P[X_2 = x_2] \cdot ... \cdot P[X_n = x_n] \equiv \prod_{i=1}^{n} P[X_i = x_i]
 \end{equation*}
 
-If the assumed probability density function $f (x_i ;\theta)$ and parameter value of $\theta$ are correct, we expect a high probability for the actually observed data to occur, which corresponds to a \textbf{maximisation} of $\Likelihood(\theta)$.
-
-\subsection{Maximum Likelihood for Exponential Distribution}
-Given observation $X_1, X_2, \dots, X_n\ \text{i.i.d.}\ \sim \Exp{\lambda}$, that is $f(x_i;\lambda) = \lambda e^{-\lambda x_i}$. The \textbf{likelihood function} for such a  dataset is given by
+The probability that $x_1,x_2,\dots,x_n$ are observed depends on the \textbf{parameter $\theta$} which needs to be \textbf{estimated}. The Likelihood function $\Likelihood(\theta)$ which we want to maximize is given by:
 \begin{equation*}
-	\Likelihood = \prod_{i=1}^{n} \lambda e^{-\lambda x_i}
+	\Likelihood(\theta) = \prod_{i=1}^{n} P[X_i = x_i | \theta ]
 \end{equation*}
 
-The \textbf{Log likelihood} is
-\begin{equation*}
-	\log(\Likelihood(\lambda)) = n\log(\lambda) - \lambda\sum_{i=1}^n x_i
-\end{equation*}
-
-\subsection{z-Test}
-In the z-Test the value of $\sigma_X$ is known.
-\begin{enumerate}
-	\item \textbf{Model} $X_i$ is a continuous measurement variable
+\begin{definition}
+	\textbf{For Continuous Distribution}\\
+	Given a continuous probability distribution  with probability density function $f (x;\theta)$, then the probability that each observation $x_i$ falls into its corresponding interval $[x_i, x_i + \text{d}x_i]$ is
 	\begin{equation*}
-		X_i, \dots, X_n \text{i.i.d.} \N{\mu, \sigma_X^2}\quad \sigma_X\ \text{known}
+		\prod_{i=1}^{n} f(x_i; \theta) \text{d}x_i \quad \quad \text{or, as d} x_i \text{ is small and does not contain }\theta \text{: } \Likelihood(\theta) = \prod_{i=1}^{n} f(x_i;\theta)
 	\end{equation*}
-	\item \textbf{Null Hypothesis} $H_0: \mu = \mu_0$\\ \textbf{Alternative Hypothesis} $H_A: \mu \neq \mu_0\ \text{or}\ \mu < \mu_0\ \text{or}\ \mu > \mu_0$
-	\item \textbf{Test statistic}
+\end{definition}
+
+\begin{definition}
+	\textbf{For Exponential Distribution}\\
+	Given observation $X_1, X_2, \dots, X_n\ \text{i.i.d.}\ \sim \Exp{\lambda}$, that is $f(x_i;\lambda) = \lambda e^{-\lambda x_i}$. The \textbf{likelihood function} for such a dataset is given by
 	\begin{equation*}
-		Z = \frac{\samplemean{X}_n - \mu_0}{\sigma_{\samplemean{X}_n}} = \frac{\samplemean{X}_n - \mu_0}{\sigma_X / \sqrt{n}} = \frac{\text{observed} - \text{expected}}{\text{standard error}}
+		\Likelihood(\lambda) = \prod_{i=1}^{n} \lambda e^{-\lambda x_i}
 	\end{equation*}
-	\textbf{Null distribution} $Z \sim \N{0,1}$
-	\item \textbf{Significance Level} $\alpha$
-	\item \textbf{Rejection region for test statistic}
+	
+	\noindent
+	The \textbf{Log likelihood} is
+	\begin{equation*}
+		\log(\Likelihood(\lambda)) = n\log(\lambda) - \lambda\sum_{i=1}^n x_i
+	\end{equation*}
+	
+	\noindent
+	The maximum likelihood estimate $\hat{\lambda}$ corresponds to the result with "Method of Moments".
+\end{definition}
+
+\subsection{Statistical Tests and Confidence Interval for normally distributed data}
+Whenever we record a new measurement series for the same experiment, we will obtain different values (realizations) of $\hat{\mu}$ and $\hat{\sigma}^2_X$. We want to specify a \textit{confidence interval} for the estimate $\hat{\mu}$ that contains the true value of $\mu$ with a certain probability. We can also check if a realization of $\mu$ is compatible with the assumed value $\mu_0$ using a \textit{statistical test}.
+\begin{equation*}
+	\hat{\mu} = \frac{1}{n} \sum_{i=1}^{n}X_i \qquad \qquad
+	\hat{\sigma}^2_X = \frac{1}{n-1} \sum_{i=1}^{n}\left(X_i-\overbar{X}_n\right)^2
+\end{equation*}
+
+
+\subsubsection{z-Test ($\sigma_X$ known)}
+
+\begin{enumerate}[label=\textbf{\arabic*})] % bold item numbering
+	\item \textbf{Model:} $X_i$ is a continuous measurement variable $ X_i, \dots, X_n \text{ i.i.d. } \sim \N{\mu, \sigma_X^2}, \quad \sigma_X\ \text{known}$
+	\item \textbf{Null Hypothesis:} $H_0: \mu = \mu_0$\\ \textbf{Alternative Hypothesis:} $H_A: \mu \neq \mu_0\ \text{or}\ \mu < \mu_0\ \text{or}\ \mu > \mu_0$
+	\item \textbf{Test statistic:}
+	\begin{alignat*}{2}
+		\text{With Standardization: }&& \quad Z &= \frac{\samplemean{X}_n - \mu_0}{\sigma_{\samplemean{X}_n}} = \frac{\samplemean{X}_n - \mu_0}{\sigma_X / \sqrt{n}} = \frac{\sqrt{n}\left(\samplemean{X}_n - \mu_0\right)}{\sigma_X} =\frac{\text{observed} - \text{expected}}{\text{standard error}}\\
+		\text{Without Standardization: }&& \quad T &=\samplemean{X}_n \quad \text{(Mean value of the measurements)}
+	\end{alignat*}
+	\textbf{Null distribution (assuming $H_0$ is true):}
+	\begin{alignat*}{2}
+		\text{With Standardization: }&& \quad Z &\sim \N{0,1}\\
+		\text{Without Standardization: }&& \quad T &\sim \N{\mu_0,\frac{\sigma^2_X}{n}}
+	\end{alignat*}
+	\item \textbf{Significance Level:} $\alpha$
+	\item \textbf{Rejection region \textit{K} for test statistic:}
 	\begin{alignat*}{2}
 		K &= (-\infty,z_{\frac{\alpha}{2}}] \cup [z_{1-\frac{\alpha}{2}}, \infty) &\qquad \text{for } H_A : \mu\neq \mu_0\\
 		K &= (-\infty, z_\alpha] &\qquad \text{for } H_A : \mu < \mu_0\\
 		K &= [ z_{1-\alpha}, \infty ) &\qquad \text{for } H_A : \mu > \mu_0
 	\end{alignat*}
-	\item \textbf{Test Statistic} Check whether the observed value of the test statistic fall into the rejection region
+	, where: $z_{\alpha/2} = \Phi^{-1}(\alpha / 2)$\\
+	Example without standardization for $T \sim \N{\mu_0,\frac{\sigma^2_X}{n}} = \N{80,\frac{0.01^2}{13}}$:
+\begin{minted}{R}
+qnorm(0.025,80.0,0.01/sqrt(13))
+## [1] 79.99456
+
+qnorm(0.975,80.0,0.01/sqrt(13))
+## [1] 80.00544
+\end{minted}
+	Therefore, $K = (\infty, 79.99] \cup [80.01, \infty)$
+	\item \textbf{Test Decision:} Check if the observed value of the test statistic falls into the rejection region.
 \end{enumerate}
 
-\begin{definition}
-	The \textbf{$p$-value} is the probability that the test statistic will take on a value that is at least as extreme (with respect to the alternative hypothesis) as the observed value of the statistic when the null hypothesis $H_0$ is true.
-\end{definition}
+
+\subsubsection{t-Test ($\sigma_X$ unknown)}
+As the standard deviation is unknown, we estimate it from the measurements:
+\begin{equation*}
+	\hat{\sigma}^2_X = \frac{1}{n-1} \sum_{i=1}^{n}\left(X_i-\overbar{X}_n\right)^2
+\end{equation*}
 
 \begin{definition}
-	\textbf{$p$-value and Test Statistic}: By means of the $p$-value the test decision can be concluded directly: If the $p$-value is smaller than the significance level, then  the null hypothesis $H_0$ is rejected, otherwise it is retained. For a given significance level $\alpha$ a conclusion is drawn on the basis of the $p$-value:
+	\textbf{\textit{t}-distribution}\\
+	Test statistic is given by:
+	$T=\dfrac{\samplemean{X}_n-\mu_0}{\hat{\sigma}_X/\sqrt{n}} =\dfrac{\text{observed} - \text{expected}}{\text{standard error}}$
+\end{definition}
+
+\noindent
+Summary Statistics: 
+\begin{align*}
+	\text{E}(T) &= 0\\
+	\Var{T} &= \dfrac{n}{n-2}
+\end{align*}
+
+\noindent
+For large $n$, $t_n$ becomes similar to $\N{0, 1}$. 
+
+
+
+\begin{enumerate}[label=\textbf{\arabic*})] % bold item numbering
+	\item \textbf{Model:} Measurement realizations $ X_i, \dots, X_n \text{ i.i.d. } \sim \N{\mu, \sigma_X^2}, \quad \sigma_X\ \text{estimated by } \hat{\sigma}_X$
+	\item \textbf{Null Hypothesis:} $H_0: \mu = \mu_0$\\ \textbf{Alternative Hypothesis:} $H_A: \mu \neq \mu_0\ \text{or}\ \mu < \mu_0\ \text{or}\ \mu > \mu_0$
+	\item \textbf{Test statistic:}
+	\begin{equation*}
+		T = \frac{\sqrt{n}\left(\samplemean{X}_n - \mu_0\right)}{\hat{\sigma}_X} =\frac{\text{observed} - \text{expected}}{\text{estimated standard error}}
+	\end{equation*}
+	\textbf{Null distribution (assuming $H_0$ is true):}
+	\begin{equation*}
+		T \sim t_{n-1}
+	\end{equation*}
+	\item \textbf{Significance Level:} $\alpha$
+	\item \textbf{Rejection region \textit{K} for test statistic:}
+	\begin{alignat*}{2}
+		K &= (-\infty,t_{n-1;\frac{\alpha}{2}}] \cup [t_{n-1;1-\frac{\alpha}{2}}, \infty) &\qquad \text{for } H_A : \mu\neq \mu_0\\
+		K &= (-\infty, t_{n-1;\alpha}] &\qquad \text{for } H_A : \mu < \mu_0\\
+		K &= [ t_{n-1;1-\alpha}, \infty ) &\qquad \text{for } H_A : \mu > \mu_0
+	\end{alignat*}
+	Example for $\alpha = 0.05$, $n=13$ measurement values, $\mu=\mu_0=80$, $\sigma_X \approx \hat{\sigma}_X \approx 0.024$, we can calculate $t_{13-1;1-0.025}=t_{12;0.975}$ in R: 
+\begin{minted}{R}
+qt(0.975,12)
+## [1] 2.178813
+\end{minted}
+	Therefore, $K = (\infty, -2.179] \cup [2.179, \infty)$
+	\item \textbf{Test Decision:} Check if the observed value of the test statistic falls into the rejection region.\\
+	
+	\noindent
+	Example: Based on our measurements, we find: 
+	\begin{equation*}
+		\overbar{x} = 80.02 \qquad \hat{\sigma}_X = 0.024
+	\end{equation*}
+	The realization of the test statistics is 
+	\begin{equation*}
+	t = \frac{\sqrt{n}\left(\samplemean{x}_n - \mu_0\right)}{\hat{\sigma}_X} = \frac{\sqrt{13}(80.02-80.00)}{0.024}= 3.00
+	\end{equation*}
+	The observed value of the test statistic falls into the rejection region. Therefore, the null hypothesis is rejected at the 5\% level.
+\end{enumerate}
+
+\noindent
+\textbf{Direct implementation in R:}\\
+\begin{minted}{R}
+x <- c(79.98, 80.04, 80.02, 80.04, 80.03, 80.03, 80.04, 79.97, 80.05, 
+  80.03, 80.02, 80.00, 80.02)
+
+t.test(x, alternative = "two.sided", mu = 80.00, conf.level = 0.95)
+
+##
+## One Sample t-test
+##
+## data: x
+## t = 3.1246, df = 12, p-value = 0.008779
+## alternative hypothesis: true mean is not equal to 80
+## 95 percent confidence interval:
+## 80.00629 80.03525
+## sample estimates:
+## mean of x
+## 80.02077
+\end{minted}
+
+
+\subsubsection{\textit{p}-value}
+A $p$-value takes on values between 0 and 1 and measures to which extent a null hypothesis
+is in agreement with given data (0: no agreement at all; 1: strong agreement).
+
+If the $p$-value is smaller than a significance level $\alpha$, which is usually $0.05$, then the null hypothesis is rejected.
+
+\begin{definition}
+	\textbf{\textit{p}-value and Statistical Test:}\\
+	The \textit{p}-value is the probability, that the test statistic will take on a value that is at least as extreme (with respect to the alternative hypothesis) as the observed value of the statistic when the null hypothesis $H_0$ is true.\\
+	
+	\noindent
+	If the $p$-value is smaller than the significance level, the null hypothesis $H_0$ is rejected, otherwise it is retained. For a given significance level $\alpha$, we conclude on the basis of the $p$-value:
 	\begin{enumerate}
-		\item Reject $H_0$ if $p$-value $\leq \alpha$
-		\item Reject $H_0$ if $p$-value $> \alpha$
+		\item \textbf{Reject} $H_0$ if $p$-value $\leq \alpha$
+		\item \textbf{Retain} $H_0$ if $p$-value $> \alpha$
 	\end{enumerate}
 \end{definition}
-
-\subsection{Example: Statistical Test for Average Body Height}
-\textit{According to the Federal Statistical Office the average body length of Swiss women is 1.64m. You doubt this statement is true. How can you reject it?}\\
-
-\vspace{1em}
-\noindent
-The answer is to measure the body length of women in Zürich (150 in this case). These measured body lengths $x_1,\dots,x_{150}$ can be considered as realisations of the random variables $X_1,\dots,X_{150} \sim \N{\mu, \sigma_X^2}$. Now the empirical mean $\samplemean{x}_{150}$ of the 150 measurements is computed, the value of this empirical mean will vary. The measured mean $\samplemean{x}_{150}$ is considered a realisation of the random variable $\samplemean{X}_{150}$, which is also called the sample mean. The distribution of the sample mean $\samplemean{X}_{150}$ is
-\begin{equation*}
-	\samplemean{x}_{150} \sim \N{\mu, \sigma_{\samplemean{X}_150}^2}
-\end{equation*}
-To decide whether the measured average of your sample is compatible with the value 1.64m given by the Federal Statistical Office the \textbf{null hypothesis} $\mu_0 = 1.64$ is defined. The probability to observe $\samplemean{x}_{150}$ or an even more extreme value assuming
-\begin{equation*}
-	\samplemean{x}_{150} \sim \N{\mu=1.64, \frac{\sigma_X^2}{150}}
-\end{equation*}
-is then calculated.
 \begin{itemize}
 	\item p-value for a one-sided alternative hypothesis pointing upwards (true $\mu > \mu_0$)
 	\begin{equation*}
@@ -645,37 +745,77 @@ is then calculated.
 		P(\samplemean{x}_{n} < \abs{\samplemean{X}_{n}})
 	\end{equation*}
 \end{itemize}
-If the p-value is smaller than a significance level $\alpha$, which is usually $0.05$, then the null hypothesis is rejected. In the example this means that the average body length is significantly larger, smaller or different than 164cm.
 
-\begin{definition}
-	The \textbf{p-value} is the probability that the test statistic will take on a value that is at least as extreme (with respect to the alternative hypothesis) as the observed value of the statistic when the null hypothesis $H_0$ is true.
-	
-	By means of the p-value the test decision can be concluded directly: If the p-value is smaller than the significance level, then the null hypothesis $H_0$ is rejected, otherwise retained. For a given significance level $\alpha$ (usually $\alpha = 0.05$) on the basis of the p-value the conclusion is as follows:
-	\begin{enumerate}
-		\item Reject $H_0$ if the p-value $\leq \alpha$
-		\item Retain $H_0$ if the p-value $> \alpha$
-	\end{enumerate}
-\end{definition}
+\noindent
+Calculation of the one-sided \textit{p}-value in R, where $\text{df = }n-1$: 
+\begin{minted}{R}
+1-pt(3.1246, df=12)
+## [1] 0.004389739
+\end{minted}
+Based on this result, we reject the  null hypothesis at the 5\% level.\\
 
-\subsection{Confidence Intervals}
+\noindent
+Calculation of the two-sided \textit{p}-value in R, where $\text{df = }n-1$:\\
+$p$-value$ = P(\abs{T} > \abs{t}) = 2 \cdot P(T > \abs{t})$
+\begin{minted}{R}
+2*(1-pt(3.1246, df=12))
+## [1] 0.008779477
+\end{minted}
+Based on this result, we reject the  null hypothesis at the 5\% level.\\
+
+\noindent
+\textbf{Example: Statistical Test for Average Body Height}
+\textit{According to the Federal Statistical Office the average body length of Swiss women is 1.64m. You doubt this statement is true. How can you reject it?}\\
+
+\noindent
+The answer is to measure the body length of women in Zürich (150 in this case). We consider $x_1,\dots,x_{150}$ as realisations of the random variables $X_1,\dots,X_{150} \sim \N{\mu, \sigma_X^2}$. The empirical mean $\samplemean{x}_{150}$ of the 150 measurements is computed, $\samplemean{x}_{150}$ is considered a realisation of the random variable $\samplemean{X}_{150}$, which is also called the sample mean. The distribution of the sample mean $\samplemean{X}_{150}$ is
+\begin{equation*}
+	\samplemean{x}_{150} \sim \N{\mu, \sigma_{\samplemean{X}_{150}}^2}
+\end{equation*}
+To decide whether the measured average of your sample is compatible with the value 1.64m given by the Federal Statistical Office the \textbf{null hypothesis} $\mu_0 = 1.64$ is defined. The probability to observe $\samplemean{x}_{150}$ or an even more extreme value assuming
+\begin{equation*}
+	\samplemean{x}_{150} \sim \N{\mu=1.64, \frac{\sigma_X^2}{150}}
+\end{equation*}
+is then calculated.
+
+
+\subsubsection{Confidence Intervals}
 The confidence interval consists of all values $\mu$, for which the corresponding statistical test does not reject the null hypothesis. For a two-sided $t$-test, the rejection region is
 \begin{equation*}
-	K = \left( -\infty, t_{n-1; \frac{\alpha}{2}} \right] \cup \left[ t_{n-1; 1- \frac{\alpha}{2}}, \infty \right)
+	K = \left( -\infty, t_{n-1; 1-\frac{\alpha}{2}} \right] \cup \left[ t_{n-1; 1- \frac{\alpha}{2}}, \infty \right)
 \end{equation*}
 The t-test does not reject $H_0$ , if the value of the test statistic does not fall into the rejection region of the test statistic
-\begin{align*}
-	t_{n-1; \frac{\alpha}{2}} &\leq \frac{\sqrt{n}(\samplemean{x}_n - \mu_0)}{\widehat{\sigma}_X}\\
-	\text{and } &\\
-	t_{n-1; 1 - \frac{\alpha}{2}} &\geq \frac{\sqrt{n}(\samplemean{x}_n - \mu_0)}{\widehat{\sigma}_X}
-\end{align*}
+\begin{equation*}
+	t_{n-1; \frac{\alpha}{2}} \leq \frac{\sqrt{n}(\samplemean{x}_n - \mu_0)}{\widehat{\sigma}_X} \qquad	\text{and } \qquad
+	t_{n-1; 1 - \frac{\alpha}{2}} \geq \frac{\sqrt{n}(\samplemean{x}_n - \mu_0)}{\widehat{\sigma}_X}
+\end{equation*}
 
 \begin{definition}
 	The two-sided confidence interval at the level $1-\alpha$ is:
 	\begin{equation*}
 		\left[ \samplemean{x}_n - t_{n-1,1-\frac{\alpha}{2}}\cdot\frac{\widehat{\sigma}_X}{\sqrt{n}}, \samplemean{x}_n + t_{n-1,1-\frac{\alpha}{2}}\cdot\frac{\widehat{\sigma}_X}{\sqrt{n}} \right]
 	\end{equation*}
+	The one-sided confidence interval includes all parameter values for which a one-sided test would not reject the null hypothesis. At the level $1 - \alpha$, it is given by:
+	\begin{align*}
+		\text{If } H_A: \mu < \mu_0 &: \left(- \infty;\overbar{x}_n + t_{n-1,1-\alpha}\cdot \dfrac{\widehat{\sigma}_X}{\sqrt{n}} \right]\\
+		\text{If } H_A: \mu > \mu_0 &: \left[\overbar{x}_n - t_{n-1,1-\alpha} \cdot \dfrac{\widehat{\sigma}_X}{\sqrt{n}};\infty \right)
+	\end{align*}
 \end{definition}
 
+\subsubsection{Statistical Significance and Relevance in Tests}
+If we consider the production of screws as an example: We assume that deviations
+up to 0.5mm of of the target length 100mm are not worrisome, and are consequently
+irrelevant. Hence, we have an "irrelevant region", ranging from 99.5mm to 100.5mm.
+We call the region outside of this interval the \textit{relevance region}.
+
+
+\begin{center}
+	\includegraphics[width=0.95\linewidth]{img/statistical-relevance}
+\end{center}
+The confidence intervals for $\mu$ are represented by dashes. The "irrelevant region"
+spans from $\mu_0 - \delta$ to $\mu_0 + \delta$ (green). $\delta$ was specified on the basis of expert knowledge.
+
+\newpage \newpage
 \section{Multivariate Probability Distributions}
 
 \subsection{Discrete Joint Probability Distributions}
