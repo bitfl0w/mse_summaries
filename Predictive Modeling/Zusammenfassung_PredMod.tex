@@ -346,7 +346,8 @@ As $P(X > 130) = 1 - P(X < 130)$, we calculate it in R:
 	For $Y=a+b X$, the following relations apply:
 	\begin{enumerate}[label=(\roman*)]
 		\item $\mathrm{E}(Y)=\mathrm{E}(a+b X)=a+b \mathrm{E}(X)$
-		\item $\operatorname{Var}(Y)=\operatorname{Var}(a+b X)=b^2 \operatorname{Var}(X), \quad \sigma_Y=|b| \sigma_X$
+		\item $\operatorname{Var}(Y)=\operatorname{Var}(a+b X)=b^2 \operatorname{Var}(X), \quad \sigma_Y=|b| \sigma_X$\\
+		Example: given is $\operatorname{Var}(X)=3$; $\operatorname{Var}(Y) = 2$, then $\operatorname{Var}(3X-2Y+5)=3^2 \cdot 3 \boldsymbol{+} 2^2 \cdot 2 = 35$ 
 		\item $\alpha - \text{Quantile of } Y=q_Y(\alpha)=a+b q_X(\alpha)$
 		\item $f_Y(y)=\frac{1}{b} f_X\left(\frac{y-a}{b}\right)$
 	\end{enumerate}
@@ -406,7 +407,7 @@ $$
 
 \begin{definition}
 	\textbf{Summary Statistics of the Sample Total $S_n$:}\\
-	For random variables $X_1,X_2,\dots,X_n$ i.i.d.:
+	For random variables $X_1,X_2,\dots,X_n$ i.i.d., we can express the total as $S_n \sim \N{n \mu_X, n \sigma^2_X}$:
 	\begin{align*}
 		\ev{S_n} &= \ev{X_1 + X_2 + \dots + X_n} = \sum_{i=1}^{n} \ev{X_i} = n\mu\\
 		\Var{S_n} &= \sum_{i=1}^{n}\Var{X_i} = n\Var{X_i} = n\sigma_X^2\\
@@ -420,7 +421,7 @@ $$
 	\begin{align*}
 		\ev{\samplemean{X}_n} &= \ev{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n} \sum_{i=1}^{n} \ev{X_i} = \mu\\
 		\Var{\samplemean{X}_n} &= \Var{\frac{X_1 + X_2 + \dots + X_n}{n}} = \frac{1}{n^2} \sum_{i=1}^{n}\Var{X_i} = \frac{1}{n^2}n\sigma_X^2 = \frac{\sigma_X^2}{n}\\
-		\sigma (\samplemean{X}_n) &= \frac{\sigma_X}{\sqrt{n}} = \frac{1}{\sqrt{n}} \sigma_X
+		\sigma (\samplemean{X}_n) &= \frac{\sigma_X}{\sqrt{n}} = \frac{1}{\sqrt{n}} \sigma_X\\
 	\end{align*}
 \end{definition}
 
@@ -629,7 +630,7 @@ qnorm(0.975,80.0,0.01/sqrt(13))
 	\item \textbf{Test Decision:} Check if the observed value of the test statistic falls into the rejection region.
 \end{enumerate}
 
-
+\newpage
 \subsubsection{t-Test ($\sigma_X$ unknown)}
 As the standard deviation is unknown, we estimate it from the measurements:
 \begin{equation*}
@@ -692,8 +693,9 @@ qt(0.975,12)
 	The observed value of the test statistic falls into the rejection region. Therefore, the null hypothesis is rejected at the 5\% level.
 \end{enumerate}
 
+\newpage
 \noindent
-\textbf{Direct implementation in R:}\\
+\textbf{Direct implementation in R:}
 \begin{minted}{R}
 x <- c(79.98, 80.04, 80.02, 80.04, 80.03, 80.03, 80.04, 79.97, 80.05, 
   80.03, 80.02, 80.00, 80.02)
@@ -718,11 +720,10 @@ t.test(x, alternative = "two.sided", mu = 80.00, conf.level = 0.95)
 A $p$-value takes on values between 0 and 1 and measures to which extent a null hypothesis
 is in agreement with given data (0: no agreement at all; 1: strong agreement).
 
-If the $p$-value is smaller than a significance level $\alpha$, which is usually $0.05$, then the null hypothesis is rejected.
-
 \begin{definition}
 	\textbf{\textit{p}-value and Statistical Test:}\\
 	The \textit{p}-value is the probability, that the test statistic will take on a value that is at least as extreme (with respect to the alternative hypothesis) as the observed value of the statistic when the null hypothesis $H_0$ is true.\\
+	The \textit{p}-value is the lowest significance level at which $H_0$ is rejected.\\
 	
 	\noindent
 	If the $p$-value is smaller than the significance level, the null hypothesis $H_0$ is rejected, otherwise it is retained. For a given significance level $\alpha$, we conclude on the basis of the $p$-value:
@@ -791,16 +792,34 @@ The t-test does not reject $H_0$ , if the value of the test statistic does not f
 \end{equation*}
 
 \begin{definition}
-	The two-sided confidence interval at the level $1-\alpha$ is:
+	The \textbf{two-sided confidence interval} at the level $1-\alpha$ is:
 	\begin{equation*}
 		\left[ \samplemean{x}_n - t_{n-1,1-\frac{\alpha}{2}}\cdot\frac{\widehat{\sigma}_X}{\sqrt{n}}, \samplemean{x}_n + t_{n-1,1-\frac{\alpha}{2}}\cdot\frac{\widehat{\sigma}_X}{\sqrt{n}} \right]
 	\end{equation*}
-	The one-sided confidence interval includes all parameter values for which a one-sided test would not reject the null hypothesis. At the level $1 - \alpha$, it is given by:
+	The \textbf{one-sided confidence interval} includes all parameter values for which a one-sided test would not reject the null hypothesis. At the level $1 - \alpha$, it is given by:
 	\begin{align*}
 		\text{If } H_A: \mu < \mu_0 &: \left(- \infty;\overbar{x}_n + t_{n-1,1-\alpha}\cdot \dfrac{\widehat{\sigma}_X}{\sqrt{n}} \right]\\
 		\text{If } H_A: \mu > \mu_0 &: \left[\overbar{x}_n - t_{n-1,1-\alpha} \cdot \dfrac{\widehat{\sigma}_X}{\sqrt{n}};\infty \right)
 	\end{align*}
 \end{definition}
+
+\noindent
+Example: 95 \% confidence interval for $n=9$, empirical mean $\overbar{x}_n=4$, empirical standard deviation $\widehat{\sigma}_X$=2 using the two-sided confidence interval:
+\begin{equation*}
+	\left[4-t_{n-1,1-\frac{\alpha}{2}}\cdot\frac{2}{\sqrt{9}}, 4+t_{n-1,1-\frac{\alpha}{2}}\cdot\frac{2}{\sqrt{9}} \right]
+\end{equation*}
+
+\newpage
+\noindent
+\textbf{Calculation in R:}
+\begin{minted}{R}
+4-2/sqrt(9)*qt(0.975, 8)
+[1] 2.462664
+
+4+2/sqrt(9)*qt(0.975, 8)
+[1] 5.537336
+\end{minted}
+The 95 \% confidence interval for the true sample mean is therefore: $\left[2.462664, 5.537336 \right]$.
 
 \subsubsection{Statistical Significance and Relevance in Tests}
 If we consider the production of screws as an example: We assume that deviations
@@ -815,6 +834,7 @@ We call the region outside of this interval the \textit{relevance region}.
 The confidence intervals for $\mu$ are represented by dashes. The "irrelevant region"
 spans from $\mu_0 - \delta$ to $\mu_0 + \delta$ (green). $\delta$ was specified on the basis of expert knowledge.
 
+\newpage
 \section{Simple Linear Regression}
 \subsection{Regression Analysis}
 Regression analysis represents a statistical method to study and model the relationship between a response variable and predictor variables. Principal goal of regression analysis is to
@@ -840,123 +860,285 @@ The simple assumption is that $f$ is linear. But Linear Regression also allows t
 \subsection{Simple Linear Regression Model}
 The assumption is that there is an approximately linear relationship between $X$ and $Y$
 \begin{equation*}
-	Y \approx \beta_0 + \beta_1 X
+	Y \approx \beta_0 + \beta_1 X \qquad \text{resp.} \qquad Y = \beta_0 + \beta_1 X + \epsilon
 \end{equation*}
 \begin{itemize}[noitemsep]
+	\item $X$: \textbf{predictor variable}
+	\item $Y$: \textbf{response variable}
 	\item $\beta_0$ represents the \textbf{intercept} of the regression line
 	\item $\beta_1$ measures the \textbf{slope} of the regression line
-	\item $\approx$ reads as "is approximately modelled as"
+	\item $\approx$ reads as "is approximately modeled as", error term $\epsilon \sim \N{0, \sigma^2}$ allows = sign to be used
 \end{itemize}
 The coefficient estimates are denoted as $\hat{\beta}_0, \hat{\beta}_1$.
 
+\noindent
+Formula for the standard error (average deviation of $\hat{\beta}_1$ to true $\beta_1)$ defined as $\text{se}(\hat{\beta}_1)$ in next section.
+
+\newpage
 \subsection{Least Squares Method}
-Let $\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$ be the predictor for $Y$ based on the $i$th value of $X$. The $i$th residual is thus $r_i = y_i - \hat{y}_i$ and stands for the difference between the $i$th observed response value and the $i$th predicted response value of the model. The Least Squares approach chooses $\hat{\beta}_0$ and $\hat{\beta}_1$ to minimise the residual sum of squares
+Let $\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$ be the predictor for $Y$ based on the $i$th value of $X$. The $i$th residual is thus $r_i = y_i - \hat{y}_i$ and stands for the difference between the $i$th observed response value and the $i$th predicted response value of the model. This approach chooses $\hat{\beta}_0$ and $\hat{\beta}_1$ to minimise the residual sum of squares:
 \begin{equation*}
 	\text{RSS} = r_1^2 + r_2^2 + r_3^2 + \dots + r_n^2
 \end{equation*}
 
+\subsubsection{Least Squares Coefficient Estimates}
 \begin{definition}
-	Least Squares Coefficient Estimates
 	\begin{equation*}
-		\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \samplemean{x})(y_i - \samplemean{y})}{\sum_{i=1}^{n}(x_i - \samplemean{x})^2}
+		\hat{\beta}_0 = \samplemean{y} - \hat{\beta}_1 \samplemean{x} \qquad \qquad \hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \samplemean{x})(y_i - \samplemean{y})}{\sum_{i=1}^{n}(x_i - \samplemean{x})^2}
 	\end{equation*}
-	\begin{equation*}
-		\hat{\beta}_0 = \samplemean{y} - \hat{\beta}_1 \samplemean{x}
-	\end{equation*}
-	where
+	, where:
 	\begin{equation*}
 		\samplemean{x} = \frac{1}{n}\sum_{i=1}^{n} x_i\qquad\text{and}\qquad\samplemean{y} = \frac{1}{n}\sum_{i=1}^{n} y_i	
 	\end{equation*}
 \end{definition}
 
 \begin{definition}
-	Standard Error
+	\textbf{Standard Error:}
 	\begin{equation*}
 		\text{se}(\hat{\beta}_0)^2 = \sigma^2 \left( \frac{1}{n} + \frac{\samplemean{x}^2}{\sum_{i=1}^{n}(x_i - \samplemean{x})^2} \right) \qquad\text{and}\qquad \text{se}(\hat{\beta}_1)^2 = \frac{\sigma^2}{\sum_{i=1}^{n}(x_i-\samplemean{x})^2}
 	\end{equation*}
-	where $\sigma^2 = \Var{\epsilon}$
+	, where: $\sigma^2 = \Var{\epsilon}$
 \end{definition}
-In general $\sigma^2$ (the variance of the error term) is not known, but can be estimated on the basis of the data.
-\begin{equation*}
-	\hat{\sigma} = \text{RSE} = \sqrt{\frac{\text{RSS}}{n-2}} = \sqrt{\frac{r_1^2 + r_2^2 + \dots + r_n^2}{n-2}}
-\end{equation*}
-The factor $\frac{1}{n-1}$ is chosen so that the estimate of $\sigma$ turns out \textbf{unbiased}.
+
+\begin{definition}
+	\textbf{Residual Standard Error (RSE):}\\
+	In general $\sigma^2$ (the variance of the error term) is not known, but can be estimated on the basis of the data. The RESE indicates how much we deviate from the true regression on average.
+	\begin{equation*}
+		\hat{\sigma} = \text{RSE} = \sqrt{\frac{\text{RSS}}{n-2}} = \sqrt{\frac{r_1^2 + r_2^2 + \dots + r_n^2}{n-2}}
+	\end{equation*}
+	The factor $\frac{1}{n-1}$ is chosen so that the estimate of $\sigma$ turns out \textbf{unbiased}.\\
+	Use the R-CMD \texttt{summary()} of a linear model, see code snippet below to get RSE.
+\end{definition}
+
+\noindent
+\textbf{Calculation of linear regression in R:}
+\begin{minted}{R}
+lm(sales ~ TV, data = Advertising)
+
+# Plot of the data:
+plot(sales ~ TV, col = "darkcyan", xlab = "TV", ylab = "Sales",
+  pch = 20, data = Advertising)
+
+# plot the linear model
+abline(lm(sales ~ TV, data = Advertising), col = "blue")
+
+# Summary output of regression model
+lm.sum <- summary(lm(sales ~ TV, data = Advertising)) # also returns RSE value
+beta_0 <- lm.sum$coefficients[1, 1] # get intercept
+beta_1 <- lm.sum$coefficients[1, 2] # get slope
+\end{minted}
+
+\newpage
+\subsubsection{Confidence \& Prediction Interval}
+These intervals rely on the assumption that the error term $e \sim \N{0, \sigma^2}$!
+
+\begin{definition}
+	The 95 \% \textbf{confidence interval} for \textbf{the slope} $\beta_1$ takes approximately the form: 
+	
+	\begin{equation*}
+		\left[ \hat{\beta}_1 - 2\cdot \text{se}(\hat{\beta}_1), \hat{\beta}_1 + 2\cdot \text{se}(\hat{\beta}_1) \right]
+	\end{equation*}
+	
+	\noindent
+	The 95 \% \textbf{confidence interval} for the \textbf{expected value} of $\hat{y} = \hat{\beta}_0+\hat{\beta}_1 \cdot x$ for a given value $x_0$, that is for $\text{E}\left[\hat{y} | x_0 \right]$:
+	\begin{equation*}
+		\left[ \hat{y}_0 - 2\cdot \text{se}(\hat{y}_0), \hat{y}_0 + 2\cdot \text{se}(\hat{y}_0) \right] \qquad, \text{where: } \text{se}(\hat{y}_0)^2 = \hat{\sigma}^2 \left( \frac{1}{n}+ \frac{(x_0-\samplemean{x})^2}{\sum_{i=1}^{n}(x_i-\samplemean{x})^2} \right)
+	\end{equation*}
+	
+	\noindent
+	\textbf{Interpretation:} with a probability of 95 \%, the true regression line passes through this interval for given $x_0$.
+\end{definition}
+
+
+\begin{definition}
+	The 95 \% \textbf{prediction interval} for \textbf{for future observations} $y_0$ at a given value $x_0$:
+	
+	\begin{equation*}
+		\left[ \hat{y}_0 - 2\cdot \text{se}(y_0), \hat{y}_0 + 2\cdot \text{se}(y_0) \right] \qquad, \text{where: } \text{se}(y_0)^2 = \hat{\sigma}^2 \left( 1 + \frac{1}{n}+ \frac{(x_0-\samplemean{x})^2}{\sum_{i=1}^{n}(x_i-\samplemean{x})^2} \right)
+	\end{equation*}
+	\textit{The "1 +" part stands for the additional uncertainty due to the error term!}\\
+	
+	\noindent
+	\textbf{Interpretation:} with 95 \% probability, a future observation $y_0$ falls into this interval.
+\end{definition}
 
 \subsection{Hypothesis Test}
 \begin{itemize}[noitemsep]
-	\item $H_0$ There is \textbf{no} relationship between $X$ and $Y$, \quad $\beta_1 = 0$
-	\item $H_A$ There is \textbf{some} relationship between $X$ and $Y$, \quad $\beta_1 \neq 0$
+	\item $H_0$: There is \textbf{no} relationship between $X$ and $Y$, \quad $\rightarrow$ $\beta_1 = 0$
+	\item $H_A$: There is \textbf{some} relationship between $X$ and $Y$, \quad $\rightarrow$ $\beta_1 \neq 0$
 \end{itemize}
 To test this hypothesis, it must be determined whether $\beta_1$ is sufficiently far from zero that there is confidence that $\beta_1$ is non-zero.
 
-\subsection{The Test Statistic T}
-\begin{definition}
-	A 95\% confidence interval is defined as a range of values such that with a 95\% probability, the range will contain the true unknown parameter. The range is defined in terms of lower and upper limits computed from the sample of data.
-\end{definition}
-The 95\% confidence can be calculated by
-\begin{equation*}
-	\left[ \hat{\beta}_1 - t_{0.975, n-2} \cdot \text{se}(\hat{\beta}_1), \hat{\beta}_1 + t_{0.975, n-2} \cdot \text{se}(\hat{\beta}_1) \right]
-\end{equation*}
 
-\subsection{Prediction Interval}
-An important task in statistics consists of predicting future observations $Y$ for a given value of $X$. Usually the variability of the fitted value $\widehat{Y}$ is not interesting, but the variability of the future observation is. This variability is called prediction interval.
+\subsection{R\textsuperscript{2} Statistic}
+Provides an alternative measure of fit instead of looking at the RSE.
 
-There might be the temptation to use the confidence interval to indicate the interval twidehat contains a future observation for a given $x_0$. However, this interval contains the expected value of $\widehat{y}_0 = \widehat{\beta}_0 + \widehat{\beta}_1 x_0$ only with a given probability. The scatter around the regression line expressed by the error term $\epsilon$ has to be accounted for as well. Thus the prediction interval can be calculated as follows
-\begin{equation*}
-	\text{se}(y_0)^2 = \widehat{\sigma}^2\left(1 + \frac{1}{n} + \frac{(x_0 - \samplemean{x})^2}{\sum_{i=1}^{n}(x_i - \samplemean{x})^2}\right)
-\end{equation*}
+\begin{itemize}[noitemsep]
+	\item R\textsuperscript{2} takes a value between 0 and 1, independent of the scale of $Y$.
+	\item If model fits the data perfectly $\rightarrow$ R\textsuperscript{2}$=1$.
+\end{itemize}
 
-\subsection{Model Assumptions for the Error Terms $\epsilon_i$}
-All test and estimation methods rely on model assumptions that the error terms $\epsilon_i$ are independent and normally distributed random variables with a constant variance
-\begin{equation*}
-	\epsilon_i \quad \text{i.i.d.} \quad \N{0,\sigma^2}
-\end{equation*}
-The error term $\epsilon_i = y_i - \left( \beta_0 + \beta_1 x_i \right)$ since $\beta_0$ and $\beta_1$ are unknown. However, the residuals $r_i = y_i - \left( \hat{\beta}_0 + \hat{\beta}_1 x_i \right)$ can be determined and are relevant to estimate the standard deviation of the error terms.
+\noindent
+\textbf{Interpretation of R\textsuperscript{2}:} Proportion of the variance in the data that is explained by the regression model.
 
-\subsubsection{Residual Standard Error}
-The RSE is an estimate of the standard deviation of $\epsilon$. Roughly speaking, it is the average amount that the response will deviate from the true regression line.
-\begin{equation*}
-	\text{RSE} = \sqrt{\frac{r_1^2 + \dots + r_n^2}{n-2}} = \sqrt{\frac{(y_1 - \hat{y}_1)^2 + \dots + (y_n - \hat{y}_n)^2}{n-2}}
-\end{equation*}
+\noindent
+The \textbf{Correlation Coefficient} is also a measure of the linear relationship between $X$ and $Y$:
 \begin{equation*}
 	r = \Cor{X,Y} = \frac{\sum_{i=1}^{n}(x_i - \samplemean{x})(y_i - \samplemean{y})}{\sqrt{\sum_{i=1}^{n} (x_i - \samplemean{x})}\sqrt{\sum_{i=1}^{n} (y_i - \samplemean{y})}}
 \end{equation*}
 
-\subsection{Diagnostic Tool for Testing Model Assumptions}
-To identify a non-linearity of regression function $f$, that is to falsify the model assumption $\ev{\epsilon_i} = 0$, the Tukey-Anscombe-Plot can be used.\\
-\paragraph{Tukey-Anscombe-Plot}
-\begin{itemize}
-	\item Plot the residuals $r_i = y_i - \hat{y}_i$ on the vertival axis
-	\item Plot the fitted or predicted values $\hat{y}_i$ on the horizontal axis
+\newpage
+\subsection{Diagnostic Tool for Testing Model Assumptions E\texorpdfstring{($\epsilon$)=}\ 0}
+If the model $f$ is non-linear, $\ev{\epsilon_i} = 0$ is violated. To identify this, use the Tukey-Anscombe-Plot.
+\subsubsection{Tukey-Anscombe-Plot}
+\begin{itemize}[noitemsep]
+	\item Plot the residuals $r_i = y_i - \hat{y}_i$ on the vertical axis.
+	\item Plot the fitted or predicted (aka 'fitted') values $\hat{y}_i$ on the horizontal axis.
+	\item Apply smoothing filter in a range of the predicted values (\texttt{LOESS} smoother).
+	\item Expectation: result after \texttt{LOESS} smoother is linear around 0.
 \end{itemize}
-The expectation is that the LOESS smoother is linear around 0.
+
+Exemplary outcome, the red line is the smoothed curve:
 \begin{center}
 	\includegraphics[width=0.8\linewidth]{img/LOESS_smoother}
 \end{center}
+\noindent
+\textbf{How much wiggliness is allowed? - Simulations of Plausible Smoothing Curves:}\\
+Apply resampling: randomly re-assign the residuals to the fitted values and repeat this process $\approx$ 100 times, plot the smoothed lines in another color (e.g. grey). Example: Is this smoothed line too wiggly and therefore violates $\ev{\epsilon_i} = 0$?
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{img/tukey-anscombe}
+\end{center}
+Outcome of the simulations, we are in the grey area and therefore $\ev{\epsilon_i} = 0$ holds.
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{img/simulation-of-Plausible-Smoothing-Curves}
+\end{center}
+
+
+\begin{minted}{R}
+plot(fitted(fit), resid(fit), col="darkgrey",
+xlab="Fitted", ylab="Residuals")
+for (i in 1:100) {
+  sresid <- sample(resid(fit), replace=TRUE)
+  lines(loess.smooth(fitted(fit), sresid), col="lightgrey", lwd=1) 
+}
+lines(loess.smooth(fitted(fit), resid(fit)), col="red", lwd=1) 
+abline(h=0, col="blue", lty="dashed")
+title('Simulation of Plausible Smoothing Curves')
+\end{minted}
+
+\paragraph{Treatment in Case of Violation of Model Assumption: Transformation of Variables}
+In case of a violation, $f$ is non-linear and we can apply a non-linear transformation to the predictor such as $\widetilde{X}=\operatorname{log}(X)$, $\widetilde{X}=\sqrt{X}$, $\widetilde{X}=X^2$ 
+
+\subsection{Diagnostic Tool for Testing Model Assumptions Var\texorpdfstring{($\epsilon$)=}\ const.}
 To identify a non-constant variance in the error terms $\epsilon_i$ the standardized residuals are used
 \begin{equation*}
-	\tilde{r}_i = \frac{r_i}{\hat{\sigma}\sqrt{1 - \left( \frac{1}{n} + \frac{(x_i - \samplemean{x})^2}{\sum_{j=1}^{n}(x_j - \samplemean{x})^2} \right)}}
+	\widetilde{r}_i = \frac{r_i}{\hat{\sigma}\sqrt{1 - \left( \frac{1}{n} + \frac{(x_i - \samplemean{x})^2}{\sum_{i=1}^{n}(x_i - \samplemean{x})^2} \right)}}
 \end{equation*}
-With $\hat{\sigma}$ being the estimate of the standard deviation of the error terms, and estimated by the residual standard error. If the error terms are normally distributed then $\tilde{r}_i \sim \N{0,1}$.
+$\hat{\sigma}$: estimate of the standard deviation of the error terms, estimated by the RSE. If the error terms are normally distributed, then $\widetilde{r}_i \sim \N{0,1}$.\\
 
-The resulting standardized residuals are then plotted in a so-called QQ-plot
+\noindent
+\textbf{Scale-Location Plot:} The square root of the absolute values of the standardized residuals are plotted vs. the predicted values $\hat{y}_i$. In the example below, the red curve not within grey band of simulated curves $\rightarrow$ heteroscedasticity. Therapeutic Treatment: log-transformation of the response variable $Y$ may lead to a constant variance.
 \begin{center}
-	\includegraphics[width=0.5\linewidth]{img/QQ_plot}
+	\includegraphics[width=0.4\linewidth]{img/scale-location-plot}
+\end{center}
+
+
+\subsection{Diagnostic Tool for Normal Distribution Assumption of the Errors \texorpdfstring{$\epsilon_i$}\ }
+We are not able to determine the error terms $\epsilon_i$ directly, we use the standardized residuals instead: $\widetilde{r}_i$ and plot them in a normal plot: 
+
+\begin{center}
+	\includegraphics[width=0.4\linewidth]{img/QQ_plot}
+\end{center}
+
+
+\subsection{Diagnostics Tool for Independence Assumption of Errors \texorpdfstring{$\epsilon_i$}\ }
+Can we predict the sign of $\epsilon_{i+1}$ based on $\epsilon_i$?
+
+\begin{itemize}[noitemsep]
+	\item Plot the residuals $r_i$ from model as a function of time.
+	\item Generate scatter plot of the residuals $r_{t+1}$ versus the residuals $r_t$.
+\end{itemize}
+
+\begin{center}
+	\includegraphics[width=0.5\linewidth]{img/residual_independence}
 \end{center}
 \begin{theorem}
 	The consequences for case of correlated error terms is that the  the estimated standard errors will tend to underestimate the true standard errors. As a result, confidence and prediction intervals will be narrower than they should be.
 \end{theorem}
 
-\subsection{Outliers}
-An outlier is point for which $y_i$ is far from value $\hat{y}_i$ predicted by model. A leverage point is a point with an unusual value for $x_i$ and can be identified by the \textbf{leverage statistic}
+
+\subsection{Outliers, Leverage Points \& Cook's Distance}
+An \textbf{outlier} is point for which $y_i$ is far from value $\hat{y}_i$ predicted by model. Removing an outlier has
+\begin{itemize}[noitemsep]
+	\item \textbf{little effect} on $\beta_0$ and $\beta_1$ \textit{(note the red and blue regression lines)}.
+	\item \textbf{important effect} on RSE and R\textsuperscript{2}.
+\end{itemize}
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{img/outliers}
+\end{center}
+
+\noindent
+A \textbf{leverage point} is a point with an unusual value for $x_i$ (below, observation 41). 
+
+\begin{itemize}[noitemsep]
+	\item Blue regression line: with observation 41; red regression line: without observation 41
+	\item Removing a high leverage observation has a \textit{much more substantial impact} on the least squares line than removing an outlier!
+\end{itemize}
+
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{img/leverage-points}
+\end{center}
+
+\noindent
+Leverage points can be identified by the \textbf{leverage statistic}:
 \begin{equation*}
 	h_i = \frac{1}{n} + \frac{(x_i + \samplemean{x})^2}{\sum_{i' = 1}^{n}(x_{i'}-\samplemean{x})^2}
 \end{equation*}
-While the Cook's distance measures the influence of an observation
+
+\begin{itemize}[noitemsep]
+	\item $h_i$ increases with the distance of $x_i$ from $\overbar{x}$.
+	\item High leverage point is a point having a large distance from the center of gravity $\overbar{x}$ - high momentum to turn the regression line around.
+	\item $h_i$ is always between $1/n$ and $1$.
+	\item Average leverage for all the observations is always equal to $2/n$ (simple linear regression).
+	\item $h_i > 2/n$: high leverage point.
+\end{itemize}
+
+\noindent
+\textbf{Cook's Distance} measured measures the influence of an observation:
 \begin{equation*}
-	d_i = \frac{1}{\hat{\sigma}^2}\cdot\left(\underline{\hat{y}}_{(-i)} - \underline{\hat{y}}\right)^T \left(\underline{\hat{y}}_{(-i)} - \underline{\hat{y}}\right) = \tilde{r}_i^2 \frac{h_i}{2(1-h_i)}
+	d_i = \frac{1}{\hat{\sigma}^2}\cdot\left(\underline{\hat{y}}_{(-i)} - \underline{\hat{y}}\right)^T \left(\underline{\hat{y}}_{(-i)} - \underline{\hat{y}}\right) = \widetilde{r}_i^2 \frac{h_i}{2(1-h_i)}
 \end{equation*}
-The larger the value of Cook’s distance $d_i$ is, the higher is the influence of the corresponding observation on the estimation of the predicted value $\hat{y}_i$. An observation with a value of Cook’s distance larger than 1 is considered as dangerously influential.
+, where $\underline{\hat{y}}_{(-i)}$ denotes the vector of predicted values if the i th observation is removed.
+
+\begin{itemize}[noitemsep]
+	\item The larger the value of Cook’s distance $d_i$ is, the higher is the influence of the corresponding observation on the estimation of the predicted value $\hat{y}_i$.
+	\item $d_i > 1$: observation is considered as dangerously influential.
+\end{itemize}
+ 
+\noindent
+\textbf{Example:}
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{img/cooks-distance}
+\end{center}
+
+\begin{itemize}[noitemsep]
+	\item Observation 41 is a high leverage point, but has a relatively small standardized residual value: potentially dangerous
+	\item Observation 5 has a large residual value, but its leverage statistic is rather small: not dangerous
+\end{itemize}
+
+
+\begin{definition}
+\textbf{Therapeutic Treatment in the Case of Outliers and High Leverage Points:}
+\begin{enumerate}[noitemsep]
+	\item Check whether outlier has occured due to an error in data collection or recording.
+	\begin{enumerate}[noitemsep]
+		\item If an error may have occured: omit the data point.
+		\item If an error can be excluded: go to 2.
+	\end{enumerate}	
+	\item Attempt to transform predictor or response variables in order to make disappear the outlier. If no improvement, go to 3.
+	\item Outlier occured due to an unusual random variation: If such outliers affect parameter estimations too much, then the observation may be	removed (needs to be mentioned in the reports!)
+\end{enumerate}
+\end{definition}
 
 
 
@@ -966,9 +1148,6 @@ The larger the value of Cook’s distance $d_i$ is, the higher is the influence 
 
 
 
-
-
-\newpage
 \newpage
 \section{Multivariate Probability Distributions}
 
